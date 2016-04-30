@@ -35,3 +35,10 @@ DEBUG:watchman.conf:Try loading config file: /Users/karthik/watchman.yml
 INFO:watchman.init:Config written in /Users/karthik/watchman.yml
 DEBUG:watchman.conf:Try loading config file: /Users/karthik/watchman.yml
 DEBUG:watchman.conf:Try loading config file: /Users/karthik/watchman.yml
+DEBUG:watchman.conf:Try loading config file: /Users/minions/watchman.yml
+DEBUG:watchman.conf:Try creating config file: /Users/minions/watchman.yml
+DEBUG:watchman.conf:Try loading config file: /Users/minions/watchman.yml
+DEBUG:watchman.conf:Try loading config file: /Users/minions/watchman.yml
+DEBUG:watchman.conf:Try loading config file: /Users/minions/watchman.yml
+INFO:watchman.conf:Updated config in /Users/minions/watchman.yml
+DEBUG:watchman.conf:Try loading config file: /Users/minions/watchman.yml

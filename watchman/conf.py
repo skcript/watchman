@@ -29,9 +29,13 @@ def load_config(config_file=CONFIG_FILE):
     config = {'source': []}
     if os.path.isfile(config_file):
         log.debug("Try loading config file: {0}".format(config_file))
-        config = yaml.load(open(CONFIG_FILE)) or config
+        config = yaml.load(open(config_file)) or config
     else:
         log.debug("Try creating config file: {0}".format(config_file))
         open(config_file, 'w')
 
     return config
+
+def update_config(config, config_file=CONFIG_FILE):
+    yaml.dump(config, open(config_file, "w"), default_flow_style=False)
+    log.info("Updated config in %s" % CONFIG_FILE)
