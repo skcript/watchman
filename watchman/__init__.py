@@ -6,7 +6,7 @@ import logging
 import subprocess
 from watch import FileWatch
 from threading import Thread
-from watchman.conf import CONFIG_FILE, LOG_FILENAME, HREGEX, NREGEX, load_config
+from watchman.conf import LOG_FILENAME, load_regexes, load_config
 
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
 log = logging.getLogger("watchman.init")
@@ -17,7 +17,7 @@ class Watchman():
 
     @staticmethod
     def configure():
-        config = load_config(CONFIG_FILE)
+        config = load_config()
 
         try:
             if len(config['source']) == 0:
@@ -54,9 +54,9 @@ class Watchman():
 
     @staticmethod
     def watch():
-        config = load_config(CONFIG_FILE)
-        # Watchman.filesync = FileWatch(regexes = [NREGEX])
-        Watchman.filesync = FileWatch()
+        config = load_config()
+        Watchman.filesync = FileWatch(regexes = load_regexes())
+        # Watchman.filesync = FileWatch()
         Watchman.filesync.start(config)
 
     @staticmethod

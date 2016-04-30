@@ -10,10 +10,19 @@ LOG_FILENAME = 'watchman.log'
 logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
 log = logging.getLogger("watchman.conf")
 
+REGEX_FILE = "regexes.yml"
 CONFIG_FILE = os.path.expanduser("~/watchman.yml")
 
-HREGEX = r"[^.]*"
-NREGEX = r"([a-zA-Z0-9_ -/]*)/active/home/(\w+)/uploads/(\d+)/hot_root/"
+def load_regexes():
+    if os.path.isfile(REGEX_FILE):
+        return []
+
+    regexes = yaml.load(open(REGEX_FILE))
+    if isinstance(regexes, list):
+        return []
+    else:
+        return regexes
+
 
 def load_config(config_file=CONFIG_FILE):
     """ Try to load YAML config file. """
