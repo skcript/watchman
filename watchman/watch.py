@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 import os
 import re
 import time
@@ -7,12 +8,17 @@ import requests
 from watchdog.observers import Observer
 from watchdog.events import RegexMatchingEventHandler
 
+from watchman.conf import load_endpoints, load_paths
+
 class FileWatch(RegexMatchingEventHandler):
-    def start(self, config):
+    def start(self):
+        self.paths = load_paths()
+        self.endpoints = load_endpoints()
         self.ignore_files = [".DS_Store", "desktop.ini"]
 
         self.observer = Observer()
-        for path in config['source']:
+        for path in self.paths:
+            print path
             self.observer.schedule(self, path=path, recursive=True)
         self.observer.start()
 
@@ -26,10 +32,10 @@ class FileWatch(RegexMatchingEventHandler):
 
             if event.is_directory:
                 print "Created folder {0}".format(src)
-                requests.post("http://localhost/api/v2/folders/create", params=options)
+                requests.post(self.endpoints['folder_create'], params=options)
             elif not os.path.basename(event.src_path) in self.ignore_files:
                 print "Created file {0}".format(src)
-                requests.post("http://localhost/api/v2/files/create", params=options)
+                requests.post(self.endpoints['file_create'], params=options)
         except Exception, e:
             print(e)
 
@@ -40,10 +46,10 @@ class FileWatch(RegexMatchingEventHandler):
 
             if event.is_directory:
                 print "Deleted folder {0}".format(src)
-                requests.post("http://localhost/api/v2/folders/destroy", params=options)
+                requests.post(self.endpoints['folder_destroy'], params=options)
             elif not os.path.basename(event.src_path) in self.ignore_files:
                 print "Deleted file {0}".format(src)
-                requests.post("http://localhost/api/v2/folders/destroy", params=options)
+                requests.post(self.endpoints['file_destroy'], params=options)
 
         except Exception, e:
             print(e)
@@ -57,10 +63,10 @@ class FileWatch(RegexMatchingEventHandler):
 
             if event.is_directory:
                 print "Moved folder from {0} to {1}".format(src, dest)
-                requests.post("http://localhost/api/v2/folders/move", params=options)
+                requests.post(self.endpoints['folder_move'], params=options)
             elif not os.path.basename(event.src_path) in self.ignore_files:
                 print "Moved file from {0} to {1}".format(src, dest)
-                requests.post("http://localhost/api/v2/files/move", params=options)
+                requests.post(self.endpoints['file_move'], params=options)
         except Exception, e:
             print(e)
 

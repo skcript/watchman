@@ -11,7 +11,6 @@ from watchman.conf import LOG_FILENAME, load_regexes, load_config, update_config
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
 log = logging.getLogger("watchman.init")
 
-
 class Watchman():
     filesync = None
 
@@ -51,10 +50,9 @@ class Watchman():
 
     @staticmethod
     def watch():
-        config = load_config()
         Watchman.filesync = FileWatch(regexes = load_regexes())
         # Watchman.filesync = FileWatch()
-        Watchman.filesync.start(config)
+        Watchman.filesync.start()
 
     @staticmethod
     def stop():
