@@ -3,3 +3,5 @@ logging
 watchdog
 observer
 requests
+hiredis
+rq
