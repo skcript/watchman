@@ -14,7 +14,7 @@ log = logging.getLogger("watchman.conf")
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 REDIS = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0)
-QUEUES = ['default', 'high', 'default', 'low']
+QUEUES = ['default', 'filewatcher', 'reports']
 
 # Settings file
 CONFIG_FILE = os.path.expanduser("~/watchman.yml")
