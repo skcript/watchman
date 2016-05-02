@@ -5,19 +5,23 @@ import time
 import shutil
 import requests
 
+from rq import Queue
+from redis import Redis
 from watchdog.observers import Observer
 from watchdog.events import RegexMatchingEventHandler
 
-from watchman.conf import load_endpoints, load_paths
+import watchman.pigeon
+
+from watchman.conf import load_paths, REDIS
 
 class FileWatch(RegexMatchingEventHandler):
+    queue = Queue('filewatcher', connection=REDIS)
+
     def start(self):
-        self.paths = load_paths()
-        self.endpoints = load_endpoints()
         self.ignore_files = [".DS_Store", "desktop.ini"]
 
         self.observer = Observer()
-        for path in self.paths:
+        for path in load_paths():
             print path
             self.observer.schedule(self, path=path, recursive=True)
         self.observer.start()
@@ -28,28 +32,26 @@ class FileWatch(RegexMatchingEventHandler):
     def on_created(self, event):
         try:
             src = event.src_path
-            options = { 'path': src }
 
             if event.is_directory:
                 print "Created folder {0}".format(src)
-                requests.post(self.endpoints['folder_create'], params=options)
+                FileWatch.queue.enqueue('watchman.pigeon.post_folder_creation', src)
             elif not os.path.basename(event.src_path) in self.ignore_files:
                 print "Created file {0}".format(src)
-                requests.post(self.endpoints['file_create'], params=options)
+                FileWatch.queue.enqueue('watchman.pigeon.post_file_creation', src)
         except Exception, e:
             print(e)
 
     def on_deleted(self, event):
         try:
             src = event.src_path
-            options = { 'path': src }
 
             if event.is_directory:
                 print "Deleted folder {0}".format(src)
-                requests.post(self.endpoints['folder_destroy'], params=options)
+                FileWatch.queue.enqueue('watchman.pigeon.post_folder_destroy', src)
             elif not os.path.basename(event.src_path) in self.ignore_files:
                 print "Deleted file {0}".format(src)
-                requests.post(self.endpoints['file_destroy'], params=options)
+                FileWatch.queue.enqueue('watchman.pigeon.post_file_destroy', src)
 
         except Exception, e:
             print(e)
@@ -59,14 +61,12 @@ class FileWatch(RegexMatchingEventHandler):
             src = event.src_path
             dest = event.dest_path
 
-            options = { 'oldpath': src, 'newpath': dest }
-
             if event.is_directory:
                 print "Moved folder from {0} to {1}".format(src, dest)
-                requests.post(self.endpoints['folder_move'], params=options)
+                FileWatch.queue.enqueue('watchman.pigeon.post_folder_move', src, dest)
             elif not os.path.basename(event.src_path) in self.ignore_files:
                 print "Moved file from {0} to {1}".format(src, dest)
-                requests.post(self.endpoints['file_move'], params=options)
+                FileWatch.queue.enqueue('watchman.pigeon.post_file_move', src, dest)
         except Exception, e:
             print(e)
 
