@@ -15,7 +15,7 @@ import watchman.pigeon
 from watchman.conf import load_paths, REDIS
 
 class FileWatch(RegexMatchingEventHandler):
-    queue = Queue(connection=REDIS)
+    queue = Queue('filewatcher', connection=REDIS)
 
     def start(self):
         self.ignore_files = [".DS_Store", "desktop.ini"]
