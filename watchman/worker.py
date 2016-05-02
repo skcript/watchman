@@ -1,12 +1,15 @@
-# # Run using `python watchman/worker.py` in "watchman" folder
-# # Even better!
-# # Run using `rq worker -c rqsetup` in "watchman" folder
-# import os
-# import redis
-# from conf import REDIS, QUEUES
-# from rq import Worker, Queue, Connection
-#
-# print("Hello from the worker sideeeee.")
-# with Connection(REDIS):
-# 	worker = Worker(map(Queue, QUEUES))
-# 	worker.work()
+# -*- encoding: utf-8 -*-
+# Run using `python watchman/worker.py` in "watchman" folder
+
+# pip install rq-dashboard
+# Run `rq-dashboard` and point browser to http://0.0.0.0:9181/
+
+import os
+import redis
+from conf import REDIS, QUEUES
+from rq import Worker, Queue, Connection
+
+print("Hello from the worker sideeeee.")
+with Connection(REDIS):
+	worker = Worker(map(Queue, QUEUES))
+	worker.work()

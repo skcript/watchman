@@ -1,9 +1,13 @@
+# -*- encoding: utf-8 -*-
 import requests
 import logging
-from watchman.conf import load_endpoints, LOG_FILENAME
+
+# Modules in Watchman
+from conf import load_endpoints, LOG_FILENAME
 
 ENDPOINTS = load_endpoints()
 
+# Logger Creds
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
 log = logging.getLogger("watchman.pigeon")
 

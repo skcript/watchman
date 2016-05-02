@@ -6,7 +6,9 @@ import logging
 import subprocess
 from watch import FileWatch
 from threading import Thread
-from watchman.conf import LOG_FILENAME, load_regexes, load_config, update_config
+
+# Modules in Watchman
+from conf import LOG_FILENAME, load_regexes, load_config, update_config
 
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
 log = logging.getLogger("watchman.init")
