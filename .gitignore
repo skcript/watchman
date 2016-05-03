@@ -3,5 +3,5 @@
 *.pyc
 *.log
 dump.rdb
-/venv
-/watchman.egg-info
+venv
+watchman.egg-info
