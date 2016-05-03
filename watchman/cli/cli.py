@@ -11,6 +11,7 @@ from watchman import Watchman
 # use unicode_literals in Python 2.
 # See http://click.pocoo.org/dev/python3/#unicode-literals for more details.
 click.disable_unicode_literals_warning = True
+watchman = Watchman()
 
 @click.group()
 def main():
@@ -21,9 +22,9 @@ def main():
 @main.command()
 def sync():
     """Start watching sources."""
-    Watchman.sync()
+    @watchman.sync()
 
 @main.command()
 def stop():
     """Stop watching sources."""
-    Watchman.stop()
+    @watchman.stop()
