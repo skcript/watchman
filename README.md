@@ -3,6 +3,8 @@ A Watchdog that pings file changes to an API of your choice.
 
 * [Dependencies](#dependencies)
 * [Compiling & Configuring](#compiling--configuring)
+* [Running Watchman](#running-watchman)
+* [Functions](#functions)
 * [Default YAML config](#default-yaml-config)
 * [Running RQ](#running-rq)
 * [Logs](#logs)
