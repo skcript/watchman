@@ -17,6 +17,11 @@ setup(
     url='http://www.skcript.com',
     license=license,
     packages=find_packages(exclude=('tests', 'docs')),
+    entry_points={
+        'console_scripts': [
+            'watchman = watchman.cli:main',
+        ],
+    },
     install_requires=(
     	['pyyaml'], ['logging'], ['watchdog'], ['observer'], ['requests'])
 )
