@@ -1,6 +1,10 @@
 # Watchman
 A Watchdog that pings file changes to an API of your choice.
 
+* [Default YAML config](#default-yaml-config)
+* [Running RQ](#running-rq)
+* [License](#license)
+
 ### Default YAML config
 ```
   source:
