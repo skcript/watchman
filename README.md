@@ -1,5 +1,5 @@
 # Watchman
-A Watchdog that pings file changes to endpoints of your choice.
+A Watchdog that pings file changes to an API of your choice.
 
 ### Default YAML config
 ```
