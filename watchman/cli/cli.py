@@ -20,10 +20,10 @@ def main():
 
 @main.command()
 def sync():
-    """Start Watchdog filewatcher"""
+    """Start watching sources."""
     Watchman.sync()
 
 @main.command()
 def stop():
-    """Stop Watchdog filewatcher"""
+    """Stop watching sources."""
     Watchman.stop()
