@@ -2,7 +2,7 @@
 A Watchdog that pings file changes to an API of your choice.
 
 * [Dependencies](#dependencies)
-* [Compiling & Configuring](#compiling-configuring)
+* [Compiling & Configuring](#compiling--configuring)
 * [Default YAML config](#default-yaml-config)
 * [Running RQ](#running-rq)
 * [Logs](#logs)
