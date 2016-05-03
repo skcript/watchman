@@ -9,6 +9,8 @@ from threading import Thread
 
 # Modules in Watchman
 from conf import LOG_FILENAME, load_regexes, load_config, update_config
+from worker import work
+import configurations
 
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
 log = logging.getLogger("watchman.init")
@@ -19,26 +21,24 @@ class Watchman():
         config = load_config()
 
         try:
-            if len(config['source']) == 0:
-                Watchman.get_source(config)
-
-            update_config(config)
+            while True:
+                ans = raw_input("MENU \n 1. Add Source 2.Remove Source 3. View 4. Save \n")
+                if (int(ans) == 1):
+                    configurations.add_source(config)
+                elif (int(ans) ==  2):
+                    configurations.remove_source(config)
+                elif (int(ans) == 3):
+                    configurations.view_source(config)
+                elif (int(ans) == 4):
+                    update_config(config)
+                else:
+                    print "Huh? That wasn't even an option. -_-"
         except KeyboardInterrupt:
             log.error("Config cancelled by user")
 
     @staticmethod
-    def get_source(config):
-        source = raw_input("What is the source path?: ")
-        if os.path.exists(source):
-            print("Adding ({0})...".format(source))
-            config['source'].append(source)
-            ans = raw_input("Add more paths? (y/n): ")
-            if ans in {"y", "Y"}:
-                Watchman.get_source(config)
-        else:
-            print("Path does not exist!")
-            Watchman.get_source(config)
-
-    @staticmethod
     def sync():
         FileWatch(regexes = load_regexes()).start()
+
+    def work():
+        work()
