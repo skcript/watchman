@@ -1,5 +1,0 @@
-pyyaml
-logging
-watchdog
-observer
-requests
