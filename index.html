@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Watchman by skcript</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Watchman</h1>
+        <p>Ping file changes to an API of your choice</p>
+
+        <p class="view"><a href="https://github.com/skcript/watchman">View the Project on GitHub <small>skcript/watchman</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/skcript/watchman/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/skcript/watchman/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/skcript/watchman">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="watchman" class="anchor" href="#watchman" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Watchman</h1>
+
+<p>A Watchdog that pings file changes to an API of your choice.</p>
+
+<ul>
+<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#compiling--configuring">Compiling &amp; Configuring</a></li>
+<li><a href="#running-watchman">Running Watchman</a></li>
+<li><a href="#functions">Functions</a></li>
+<li><a href="#yaml-config">Default YAML config</a></li>
+<li><a href="#running-rq">Running RQ</a></li>
+<li><a href="#logs">Logs</a></li>
+<li><a href="#license">License</a></li>
+</ul>
+
+<h3>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dependencies</h3>
+
+<ul>
+<li>Python 2.7 (Developed and Tested)</li>
+<li>Redis</li>
+<li><a href="http://python-rq.org">RQ</a></li>
+</ul>
+
+<h3>
+<a id="compiling--configuring" class="anchor" href="#compiling--configuring" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Compiling &amp; Configuring</h3>
+
+<ol>
+<li>Clone this Repo</li>
+<li>Run <code>python setup.py install</code>
+</li>
+<li>Configure the app by running <code>watchman configure</code>. Or copy the <a href="#yaml-config">default YAML file</a> to <code>~</code>.</li>
+</ol>
+
+<h3>
+<a id="running-watchman" class="anchor" href="#running-watchman" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running Watchman</h3>
+
+<ol>
+<li>From Terminal, run <code>watchman sync</code>
+</li>
+<li>From another Terminal, run <code>watchman worker</code>
+</li>
+</ol>
+
+<h3>
+<a id="functions" class="anchor" href="#functions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Functions</h3>
+
+<ul>
+<li>
+<code>watchman sync</code>: Watches over all paths added to <code>source</code> in <a href="#yaml-config">YAML configuration file</a>
+</li>
+<li>
+<code>watchman worker</code>: Starts the RQ worker to ping all endpoints added to <code>endpoints</code> in <a href="#yaml-config">YAML configuration file</a>
+</li>
+</ul>
+
+<h3>
+<a id="yaml-config" class="anchor" href="#yaml-config" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>YAML config</h3>
+
+<p>This YAML is automatically created in the <code>~</code> directory. It holds all the configuration attributes for Watchman.</p>
+
+<h4>
+<a id="attributes" class="anchor" href="#attributes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Attributes</h4>
+
+<ul>
+<li>
+<code>source</code>: Array of all paths Watchman should monitor</li>
+<li>
+<code>regexes</code>: Array of all regexes Watchman should abide by (These regexes are matched with the filepath)</li>
+<li>
+<code>endpoints</code>: Hash of each file/folder action which should ping to an API endpoint</li>
+</ul>
+
+<h4>
+<a id="default-file" class="anchor" href="#default-file" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Default File</h4>
+
+<pre><code>  source:
+    - /home/users/skcript
+  regexes:
+    - "([a-zA-Z0-9_ -/]*)/home/(\\w+)/uploads/"
+  endpoints:
+    file_create: "http://localhost/api/v2/files/create"
+    folder_create: "http://localhost/api/v2/folders/create"
+    file_move: "http://localhost/api/v2/files/move"
+    folder_move: "http://localhost/api/v2/folders/move"
+    file_destroy: "http://localhost/api/v2/files/destroy"
+    folder_destroy: "http://localhost/api/v2/folders/destroy"
+</code></pre>
+
+<h3>
+<a id="logs" class="anchor" href="#logs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Logs</h3>
+
+<p>All Watchman logs are maintained at <code>/tmp/watchman.log</code></p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
+
+<pre><code>Copyright 2016 Skcript.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+</code></pre>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/skcript">skcript</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
