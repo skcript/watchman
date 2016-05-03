@@ -5,7 +5,7 @@ A Watchdog that pings file changes to an API of your choice.
 * [Compiling & Configuring](#compiling--configuring)
 * [Running Watchman](#running-watchman)
 * [Functions](#functions)
-* [Default YAML config](#default-yaml-config)
+* [Default YAML config](#yaml-config)
 * [Running RQ](#running-rq)
 * [Logs](#logs)
 * [License](#license)
@@ -17,18 +17,26 @@ A Watchdog that pings file changes to an API of your choice.
 
 ### Compiling & Configuring
 1. Clone this Repo
-2. python setup.py install
-3. Configure the app by running `watchman configure`. Use the [Default YAML](#default-yaml-config).
+2. Run `python setup.py install`
+3. Configure the app by running `watchman configure`. Or copy the [default YAML file](#yaml-config) to `~`.
 
 ### Running Watchman
 1. From Terminal, run `watchman sync`
-2. From another Terminal, run `watchman worker` (Starts the RQ worker for Watchman)
+2. From another Terminal, run `watchman worker`
 
 ### Functions
-* `watchman sync`: Watches over all paths added to `source` in watchman.yml
+* `watchman sync`: Watches over all paths added to `source` in [YAML configuration file](#yaml-config)
+* `watchman worker`: Starts the RQ worker to ping all endpoints added to `endpoints` in [YAML configuration file](#yaml-config)
 
-### Default YAML config
-This YAML is automatically created in the `~` directory. 
+### YAML config
+This YAML is automatically created in the `~` directory. It holds all the configuration attributes for Watchman.
+
+#### Attributes
+* `source`: Array of all paths Watchman should monitor
+* `regexes`: Array of all regexes Watchman should abide by (These regexes are matched with the filepath)
+* `endpoints`: Hash of each file/folder action which should ping to an API endpoint
+
+#### Default File
 ```
   source:
     - /home/users/skcript
