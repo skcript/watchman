@@ -6,7 +6,7 @@ import redis
 import logging
 
 # Log configs
-LOG_FILENAME = 'watchman.log'
+LOG_FILENAME = '/tmp/watchman.log'
 logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
 log = logging.getLogger("watchman.conf")
 

@@ -6,7 +6,6 @@ Watchman command line tool
 import click
 
 from watchman import Watchman
-from watchman.worker import work
 
 # Disable the warning that Click displays (as of Click version 5.0) when users
 # use unicode_literals in Python 2.
@@ -26,4 +25,9 @@ def sync():
 @main.command()
 def worker():
     """Start watchman worker."""
-    work()
+    Watchman.work()
+
+@main.command()
+def configure():
+    """Configure watchman."""
+    Watchman.configure()

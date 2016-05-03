@@ -5,3 +5,5 @@
 dump.rdb
 venv
 watchman.egg-info
+build
+dist
