@@ -23,5 +23,7 @@ setup(
         ],
     },
     install_requires=(
-    	['pyyaml'], ['logging'], ['watchdog'], ['observer'], ['requests'])
+    	['pyyaml'], ['logging'], ['watchdog'], ['observer'], ['requests'],
+        ['rq'], ['redis']
+    )
 )
