@@ -14,8 +14,6 @@ logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
 log = logging.getLogger("watchman.init")
 
 class Watchman():
-    filesync = None
-
     @staticmethod
     def configure():
         config = load_config()
@@ -43,21 +41,4 @@ class Watchman():
 
     @staticmethod
     def sync():
-        if not Watchman.filesync:
-            Watchman.filesync = "Syncing..."
-            print(Watchman.filesync)
-            sync = Thread(target=Watchman.watch())
-            sync.daemon = True
-            sync.start()
-
-    @staticmethod
-    def watch():
-        Watchman.filesync = FileWatch(regexes = load_regexes())
-        # Watchman.filesync = FileWatch()
-        Watchman.filesync.start()
-
-    @staticmethod
-    def stop():
-        print("Stopping...")
-        Watchman.filesync.stop()
-        Watchman.filesync = None
+        FileWatch(regexes = load_regexes()).start()

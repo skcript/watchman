@@ -9,7 +9,8 @@ import redis
 from conf import REDIS, QUEUES
 from rq import Worker, Queue, Connection
 
-print("Hello from the worker sideeeee.")
-with Connection(REDIS):
-	worker = Worker(map(Queue, QUEUES))
-	worker.work()
+def work():
+	print("Hello from the worker sideeeee.")
+	with Connection(REDIS):
+		worker = Worker(map(Queue, QUEUES))
+		worker.work()

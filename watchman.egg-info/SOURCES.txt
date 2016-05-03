@@ -1,0 +1,13 @@
+watchman/__init__.py
+watchman/conf.py
+watchman/pigeon.py
+watchman/watch.py
+watchman/worker.py
+watchman.egg-info/PKG-INFO
+watchman.egg-info/SOURCES.txt
+watchman.egg-info/dependency_links.txt
+watchman.egg-info/entry_points.txt
+watchman.egg-info/requires.txt
+watchman.egg-info/top_level.txt
+watchman/cli/__init__.py
+watchman/cli/cli.py
