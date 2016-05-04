@@ -5,14 +5,13 @@ A Watchdog that pings file changes to an API of your choice.
 * [Compiling & Configuring](#compiling--configuring)
 * [Running Watchman](#running-watchman)
 * [Functions](#functions)
-* [Default YAML config](#yaml-config)
-* [Running RQ](#running-rq)
+* [YAML Configuration](#yaml-config)
 * [Logs](#logs)
 * [License](#license)
 
 ### Dependencies
 * Python 2.7 (Developed and Tested)
-* Redis
+* [Redis](http://redis.io/)
 * [RQ](http://python-rq.org)
 
 ### Compiling & Configuring
@@ -28,7 +27,7 @@ A Watchdog that pings file changes to an API of your choice.
 * `watchman sync`: Watches over all paths added to `source` in [YAML configuration file](#yaml-config)
 * `watchman worker`: Starts the RQ worker to ping all endpoints added to `endpoints` in [YAML configuration file](#yaml-config)
 
-### YAML config
+### YAML configuration
 This YAML is automatically created in the `~` directory. It holds all the configuration attributes for Watchman.
 
 #### Attributes
