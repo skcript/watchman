@@ -40,5 +40,6 @@ class Watchman():
     def sync():
         FileWatch(regexes = load_regexes()).start()
 
+    @staticmethod
     def work():
         work()
