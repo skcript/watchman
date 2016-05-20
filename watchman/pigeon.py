@@ -12,8 +12,7 @@ logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
 log = logging.getLogger("watchman.pigeon")
 
 def check_path_processing(path):
-    path = path[:-1] if path[-1] == "/" else path
-    avl = REDIS.scan_iter(match="{0}/*".format(path))
+    avl = REDIS.scan_iter(match="{0}*".format(path))
     return (sum(1 for _ in avl) > 0 or REDIS.get("migration") or REDIS.get("import") or REDIS.get("snapshot"))
 
 def post_folder_creation(src):
@@ -54,6 +53,7 @@ def post_folder_move(src, dest):
 
 def post_file_move(src, dest):
     if check_path_processing(src) or check_path_processing(dest):
+        print("Not sending file movement")
         log.debug("Not sending file movement from {0} to {1}".format(src, dest))
     else:
         log.debug("Sending file movement from {0} to {1}".format(src, dest))
