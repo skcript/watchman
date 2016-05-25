@@ -23,7 +23,7 @@ def ratelimit():
             if name:
                 while not LIMITER.checked_insert(name):
                     print "{0} is being rate limited".format(name)
-                    time.sleep(0.05)
+                    time.sleep(0.5)
             else:
                 print "Invalid args, {0}".format(args)
 
