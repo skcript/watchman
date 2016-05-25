@@ -1,33 +1,43 @@
 # -*- encoding: utf-8 -*-
+import re
+import time
 import requests
 import logging
-import time
+from rratelimit import Limiter
 
 # Modules in Watchman
 from conf import load_endpoints, LOG_FILENAME, REDIS
 
 ENDPOINTS = load_endpoints()
+LIMITER = Limiter(REDIS, action='pigeon', limit=100, period=60)
+REGEX = re.compile("([a-zA-Z0-9_ -/]*)/active/home/(\w+)/uploads/(\d+)/hot_root/")
 
 # Logger Creds
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
 log = logging.getLogger("watchman.pigeon")
 
 def RateLimited(maxPerSecond):
-    minInterval = 1.0 / float(maxPerSecond)
     def decorate(func):
-        lastTimeCalled = [0.0]
         def rateLimitedFunction(*args,**kargs):
-            elapsed = time.clock() - lastTimeCalled[0]
-            leftToWait = minInterval - elapsed
-            if leftToWait>0:
-                time.sleep(leftToWait)
-            ret = func(*args,**kargs)
-            lastTimeCalled[0] = time.clock()
-            return ret
+            name = get_user_name(args[0])
+            if name:
+                print name
+                while not LIMITER.checked_insert(name):
+                    print "sleeping"
+                    time.sleep(0.05)
+                ret = func(*args,**kargs)
+                print "returning"
+                return ret
+
         return rateLimitedFunction
     return decorate
 
-@RateLimited(1)
+def get_user_name(path):
+    r = REGEX.match(path)
+    if r:
+        name = r.group(2)
+        return name
+
 def check_path_processing(path):
     avl = REDIS.scan_iter(match="{0}*".format(path))
     return (sum(1 for _ in avl) > 0 or REDIS.get("migration") or REDIS.get("import") or REDIS.get("snapshot"))
