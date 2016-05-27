@@ -9,13 +9,17 @@ from rratelimit import Limiter
 from conf import load_endpoints, LOG_FILENAME, REDIS, RL_LIMIT, RL_PERIOD
 
 ENDPOINTS = load_endpoints()
+# Ratelimiter limiting pigeon at RL_LIMIT actions per RL_PERIOD
 LIMITER = Limiter(REDIS, action='pigeon', limit=RL_LIMIT, period=RL_PERIOD)
+
+# Regex to extract name from path watched
 REGEX = re.compile("([a-zA-Z0-9_ -/]*)/active/home/(\w+)/hot_root/")
 
 # Logger Creds
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
 log = logging.getLogger("watchman.pigeon")
 
+# Ratelimiting server pings at RL_LIMIT actions per RL_PERIOD
 def ratelimit():
     def decorate(func):
         def rateLimitedFunction(*args,**kargs):
@@ -33,15 +37,19 @@ def ratelimit():
         return rateLimitedFunction
     return decorate
 
+# Extracting user name from path
 def get_user_name(path):
     r = REGEX.match(path)
     if r:
         name = r.group(2)
         return name
 
+# Checking if server is ready to accept request
 def check_path_processing(path):
     avl = REDIS.scan_iter(match="{0}*".format(path))
     return (sum(1 for _ in avl) > 0 or REDIS.get("migration") or REDIS.get("import") or REDIS.get("snapshot"))
+
+# ---- Actual server pings ----
 
 @ratelimit()
 def post_folder_creation(src):
