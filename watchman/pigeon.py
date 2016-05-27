@@ -10,7 +10,7 @@ from conf import load_endpoints, LOG_FILENAME, REDIS, RL_LIMIT, RL_PERIOD
 
 ENDPOINTS = load_endpoints()
 LIMITER = Limiter(REDIS, action='pigeon', limit=RL_LIMIT, period=RL_PERIOD)
-REGEX = re.compile("([a-zA-Z0-9_ -/]*)/active/home/(\w+)/uploads/(\d+)/hot_root/")
+REGEX = re.compile("([a-zA-Z0-9_ -/]*)/active/home/(\w+)/hot_root/")
 
 # Logger Creds
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
