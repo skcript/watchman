@@ -18,7 +18,7 @@ REDIS = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 QUEUES = ['default', 'filewatcher', 'reports']
 
 # RateLimiter
-RL_LIMIT = 90
+RL_LIMIT = 100
 RL_PERIOD = 60
 
 # Settings file
