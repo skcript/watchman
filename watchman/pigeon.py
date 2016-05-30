@@ -13,7 +13,7 @@ ENDPOINTS = load_endpoints()
 LIMITER = Limiter(REDIS, action='pigeon', limit=RL_LIMIT, period=RL_PERIOD)
 
 # Regex to extract name from path watched
-REGEX = re.compile("([a-zA-Z0-9_ -/]*)/active/home/(\w+)/hot_root/")
+REGEX = re.compile("([a-zA-Z0-9_ -/]*)/active/home/(\w+)/")
 
 # Logger Creds
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
