@@ -45,9 +45,14 @@ def get_user_name(path):
         return name
 
 # Checking if server is ready to accept request
+def check_server():
+    return REDIS.get("migration") or REDIS.get("import") or REDIS.get("snapshot")
+
+# Checking if server is ready to accept request for that path
 def check_path_processing(path):
     avl = REDIS.scan_iter(match="{0}*".format(path))
-    return (sum(1 for _ in avl) > 0 or REDIS.get("migration") or REDIS.get("import") or REDIS.get("snapshot"))
+    srv = check_server()
+    return (sum(1 for _ in avl) > 0 or srv)
 
 # ---- Actual server pings ----
 
@@ -75,19 +80,27 @@ def post_file_creation(src):
 
 @ratelimit()
 def post_folder_destroy(src):
-    log.debug("Removing folder at {0}".format(src))
-    print("Removing folder at {0}".format(src))
+    if check_server():
+        log.debug("Not sending folder destroy at {0}".format(src))
+        print("Not sending folder destroy at {0}".format(src))
+    else:
+        log.debug("Removing folder at {0}".format(src))
+        print("Removing folder at {0}".format(src))
 
-    options = { 'path': src }
-    requests.post(ENDPOINTS['folder_destroy'], params=options)
+        options = { 'path': src }
+        requests.post(ENDPOINTS['folder_destroy'], params=options)
 
 @ratelimit()
 def post_file_destroy(src):
-    log.debug("Removing file at {0}".format(src))
-    print("Removing file at {0}".format(src))
+    if check_server():
+        log.debug("Not sending file destroy at {0}".format(src))
+        print("Not sending file destroy at {0}".format(src))
+    else:
+        log.debug("Removing file at {0}".format(src))
+        print("Removing file at {0}".format(src))
 
-    options = { 'path': src }
-    requests.post(ENDPOINTS['file_destroy'], params=options)
+        options = { 'path': src }
+        requests.post(ENDPOINTS['file_destroy'], params=options)
 
 @ratelimit()
 def post_folder_move(src, dest):
