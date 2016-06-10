@@ -35,7 +35,7 @@ class FileWatch(RegexMatchingEventHandler):
   def stop(self):
     self.observer.stop()
 
-  def on_any_event(self):
+  def on_any_event(self, event):
     # Events with hidden paths (dot files) are not registered
     if self.is_hidden(event.src_path):
         return
