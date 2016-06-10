@@ -18,8 +18,6 @@ class FileWatch(RegexMatchingEventHandler):
     queue = Queue('filewatcher', connection=REDIS)
 
     def start(self):
-        self.ignore_files = [".DS_Store", "desktop.ini"]
-
         self.observer = Observer()
         for path in load_paths():
             print path
@@ -37,6 +35,11 @@ class FileWatch(RegexMatchingEventHandler):
     def stop(self):
         self.observer.stop()
 
+    def on_any_event(self, event):
+        # Events with hidden paths (dot files) are not registered
+        if self.is_hidden(event.src_path):
+            return
+
     def on_created(self, event):
         try:
             src = event.src_path
@@ -47,7 +50,7 @@ class FileWatch(RegexMatchingEventHandler):
                     'watchman.pigeon.post_folder_creation',
                     src
                 )
-            elif not os.path.basename(event.src_path) in self.ignore_files:
+            else:
                 print "Created file {0}".format(src)
                 FileWatch.queue.enqueue(
                     'watchman.pigeon.post_file_creation',
@@ -66,7 +69,7 @@ class FileWatch(RegexMatchingEventHandler):
                     'watchman.pigeon.post_folder_destroy',
                     src
                 )
-            elif not os.path.basename(event.src_path) in self.ignore_files:
+            else:
                 print "Deleted file {0}".format(src)
                 FileWatch.queue.enqueue(
                     'watchman.pigeon.post_file_destroy',
@@ -88,7 +91,7 @@ class FileWatch(RegexMatchingEventHandler):
                     src,
                     dest
                 )
-            elif not os.path.basename(event.src_path) in self.ignore_files:
+            else:
                 print "Moved file from {0} to {1}".format(src, dest)
                 FileWatch.queue.enqueue(
                     'watchman.pigeon.post_file_move',
@@ -104,7 +107,11 @@ class FileWatch(RegexMatchingEventHandler):
 
             if event.is_directory:
                 print "Modified folder {0}".format(src)
-            elif not os.path.basename(event.src_path) in self.ignore_files:
+            else:
                 print "Modified file {0}".format(src)
         except Exception, e:
             print(e)
+
+    def is_hidden(self, path):
+        m = re.search('(?<=\/\.)\w+', path)
+        return m is not None
