@@ -35,15 +35,13 @@ class FileWatch(RegexMatchingEventHandler):
     def stop(self):
         self.observer.stop()
 
-    def on_any_event(self, event):
-        # Events with hidden paths (dot files) are not registered
-        if self.is_hidden(event.src_path):
+    def on_created(self, event):
+        src = event.src_path
+        if self.is_hidden(src):
+            # Events with hidden paths (dot files) are not registered
             return
 
-    def on_created(self, event):
         try:
-            src = event.src_path
-
             if event.is_directory:
                 print "Created folder {0}".format(src)
                 FileWatch.queue.enqueue(
@@ -60,9 +58,12 @@ class FileWatch(RegexMatchingEventHandler):
             print(e)
 
     def on_deleted(self, event):
-        try:
-            src = event.src_path
+        src = event.src_path
+        if self.is_hidden(src):
+            # Events with hidden paths (dot files) are not registered
+            return
 
+        try:
             if event.is_directory:
                 print "Deleted folder {0}".format(src)
                 FileWatch.queue.enqueue(
@@ -80,10 +81,13 @@ class FileWatch(RegexMatchingEventHandler):
             print(e)
 
     def on_moved(self, event):
-        try:
-            src = event.src_path
-            dest = event.dest_path
+        src = event.src_path
+        dest = event.dest_path
+        if self.is_hidden(src) or self.is_hidden(dest):
+            # Events with hidden paths (dot files) are not registered
+            return
 
+        try:
             if event.is_directory:
                 print "Moved folder from {0} to {1}".format(src, dest)
                 FileWatch.queue.enqueue(
@@ -98,17 +102,6 @@ class FileWatch(RegexMatchingEventHandler):
                     src,
                     dest
                 )
-        except Exception, e:
-            print(e)
-
-    def on_modified(self, event):
-        try:
-            src = event.src_path
-
-            if event.is_directory:
-                print "Modified folder {0}".format(src)
-            else:
-                print "Modified file {0}".format(src)
         except Exception, e:
             print(e)
 
