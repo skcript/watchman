@@ -16,7 +16,7 @@
     <div class="wrapper">
       <header>
         <h1>Watchman</h1>
-        <p>Ping file changes to an API of your choice</p>
+        <p>Ping file system events to any API</p>
 
         <p class="view"><a href="https://github.com/skcript/watchman">View the Project on GitHub <small>skcript/watchman</small></a></p>
 
@@ -35,12 +35,13 @@
 
 <ul>
 <li><a href="#dependencies">Dependencies</a></li>
-<li><a href="#compiling--configuring">Compiling &amp; Configuring</a></li>
+<li><a href="#installing">Installing</a></li>
 <li><a href="#running-watchman">Running Watchman</a></li>
 <li><a href="#functions">Functions</a></li>
-<li><a href="#yaml-config">YAML Configuration</a></li>
-<li><a href="#logs">Logs</a></li>
+<li><a href="#yaml-configuration">YAML Configuration</a></li>
 <li><a href="#extending">Extending</a></li>
+<li><a href="#running-watchman-as-a-service">Running Watchman as a Service</a></li>
+<li><a href="#logs">Logs</a></li>
 <li><a href="#license">License</a></li>
 </ul>
 
@@ -86,12 +87,12 @@
 </ul>
 
 <h2>
-<a id="yaml-configuration" class="anchor" href="#yaml-configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>YAML configuration</h2>
+<a id="yaml-configuration" class="anchor" href="#yaml-configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>YAML Configuration</h2>
 
 <p>This YAML is automatically created in the <code>~</code> directory. It holds all the configuration attributes for Watchman.</p>
 
-<h4>
-<a id="attributes" class="anchor" href="#attributes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Attributes</h4>
+<h3>
+<a id="attributes" class="anchor" href="#attributes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Attributes</h3>
 
 <ul>
 <li>
@@ -102,8 +103,8 @@
 <code>endpoints</code>: Hash of each file/folder action which should ping to an API endpoint</li>
 </ul>
 
-<h4>
-<a id="default-file" class="anchor" href="#default-file" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Default File</h4>
+<h3>
+<a id="default-file" class="anchor" href="#default-file" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Default File</h3>
 
 <pre><code>  source:
     - /home/users/skcript
@@ -117,11 +118,6 @@
     file_destroy: "http://localhost/api/v2/files/destroy"
     folder_destroy: "http://localhost/api/v2/folders/destroy"
 </code></pre>
-
-<h2>
-<a id="logs" class="anchor" href="#logs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Logs</h2>
-
-<p>All Watchman logs are maintained at <code>/tmp/watchman.log</code></p>
 
 <h2>
 <a id="extending" class="anchor" href="#extending" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Extending</h2>
@@ -160,6 +156,42 @@ returning a boolean for each path. Modify the <code>prevent()</code> function in
 <code>watchman/extension.py</code> to enable this.</p>
 
 <p>By default <code>prevent()</code> returns <code>False</code> and does not prevent any API calls.</p>
+
+<h2>
+<a id="running-watchman-as-a-service" class="anchor" href="#running-watchman-as-a-service" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running Watchman as a Service</h2>
+
+<p>Watchman can be run as a service in your production environments. Currently,
+only Linux environments are supported.</p>
+
+<ol>
+<li>Download <code>watchman_sync</code> and <code>watchman_worker</code> to your in <code>/etc/init.d</code> folder</li>
+<li>Create folder <code>/var/run/watchman</code> to store pids file</li>
+<li>Create a <code>/tmp</code> if it is not present already</li>
+<li>Give appropriate permissions to <code>/var/run/watchman</code> and <code>/tmp</code> (to whichever user Watchman is running from)</li>
+</ol>
+
+<p><strong>To start the service</strong></p>
+
+<pre><code>  service watchman_sync start
+  service watchman_worker start
+</code></pre>
+
+<p><strong>To stop the service</strong></p>
+
+<pre><code>  service watchman_sync stop
+  service watchman_worker stop
+</code></pre>
+
+<p><strong>To restart the service</strong></p>
+
+<pre><code>  service watchman_sync restart
+  service watchman_worker restart
+</code></pre>
+
+<h2>
+<a id="logs" class="anchor" href="#logs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Logs</h2>
+
+<p>All Watchman logs are maintained at <code>/tmp/watchman.log</code></p>
 
 <h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
