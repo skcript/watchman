@@ -91,13 +91,22 @@ only Linux environments are supported.
 4. Give appropriate permissions to `/var/run/watchman` and `/tmp` (to whichever user Watchman is running from)
 
 To start the service
-Run `service watchman_sync start` and `service watchman_worker start`
+```
+  service watchman_sync start
+  service watchman_worker start
+```
 
 To stop the service
-Run `service watchman_sync stop` and `service watchman_worker stop`
+```
+  service watchman_sync stop
+  service watchman_worker stop
+```
 
 To restart the service
-Run `service watchman_sync restart` and `service watchman_worker restart`
+```
+  service watchman_sync restart
+  service watchman_worker restart
+```
 
 ## Logs
 All Watchman logs are maintained at `/tmp/watchman.log`
