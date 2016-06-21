@@ -10,7 +10,7 @@ from conf import REDIS, QUEUES
 from rq import Worker, Queue, Connection
 
 def work():
-	print("Hello from the worker sideeeee.")
+	print("Hello from the worker side.")
 	with Connection(REDIS):
 		worker = Worker(map(Queue, QUEUES))
 		worker.work()

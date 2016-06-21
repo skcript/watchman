@@ -1,5 +1,5 @@
 # Watchman
-A Watchdog that pings file changes to an API of your choice.
+Ping file system events to any API
 
 * [Dependencies](#dependencies)
 * [Compiling & Configuring](#compiling--configuring)
@@ -7,27 +7,28 @@ A Watchdog that pings file changes to an API of your choice.
 * [Functions](#functions)
 * [YAML Configuration](#yaml-config)
 * [Logs](#logs)
+* [Extending](#extending)
 * [License](#license)
 
-### Dependencies
+## Dependencies
 * Python 2.7 (Developed and Tested)
 * [Redis](http://redis.io/)
 * [RQ](http://python-rq.org)
 
-### Compiling & Configuring
-1. Clone this Repo
+## Installing
+1. Download this Repo
 2. Run `python setup.py install`
 3. Configure the app by running `watchman configure`. Or copy the [default YAML file](#yaml-config) to `~`.
 
-### Running Watchman
+## Running Watchman
 1. From Terminal, run `watchman sync`
 2. From another Terminal, run `watchman worker`
 
-### Functions
+## Functions
 * `watchman sync`: Watches over all paths added to `source` in [YAML configuration file](#yaml-config)
 * `watchman worker`: Starts the RQ worker to ping all endpoints added to `endpoints` in [YAML configuration file](#yaml-config)
 
-### YAML configuration
+## YAML configuration
 This YAML is automatically created in the `~` directory. It holds all the configuration attributes for Watchman.
 
 #### Attributes
@@ -50,8 +51,37 @@ This YAML is automatically created in the `~` directory. It holds all the config
     folder_destroy: "http://localhost/api/v2/folders/destroy"
 ```
 
-### Logs
+## Logs
 All Watchman logs are maintained at `/tmp/watchman.log`
+
+## Extending
+Watchman can ratelimit and selectively prevent your API calls for each file
+system event. These are managed in `watchman/extension.py`. Each function defined
+in `extension.py` takes path (where the file system event occurred) as input.
+
+### Ratelimiting
+Watchman can ratelimit your API calls based on a unique string at 100 calls
+per second.
+
+The unique string is used to group your API calls. Modify the `ratelimit()`
+function in `watchman/extension.py` to enable this. By default it returns the
+root directory of the path Watchman is watching.
+
+For example, if you are monitoring `/uploads` folder which has directories for
+each user, like,
+- `/uploads/user1`
+- `/uploads/user2`
+- `/uploads/user3`
+
+Modify `ratelimit()` to return the username from the path. This way you can
+ratelimit API calls based on each user.
+
+### Preventing
+Watchman can selectively prevent API calls from being triggered by simply
+returning a boolean for each path. Modify the `prevent()` function in
+`watchman/extension.py` to enable this.
+
+By default `prevent()` returns `False` and does not prevent any API calls.
 
 License
 --------
