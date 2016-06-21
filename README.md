@@ -6,8 +6,9 @@ Ping file system events to any API
 * [Running Watchman](#running-watchman)
 * [Functions](#functions)
 * [YAML Configuration](#yaml-config)
-* [Logs](#logs)
 * [Extending](#extending)
+* [Running Watchman as a Service](#running-watchman-as-a-service)
+* [Logs](#logs)
 * [License](#license)
 
 ## Dependencies
@@ -51,9 +52,6 @@ This YAML is automatically created in the `~` directory. It holds all the config
     folder_destroy: "http://localhost/api/v2/folders/destroy"
 ```
 
-## Logs
-All Watchman logs are maintained at `/tmp/watchman.log`
-
 ## Extending
 Watchman can ratelimit and selectively prevent your API calls for each file
 system event. These are managed in `watchman/extension.py`. Each function defined
@@ -82,6 +80,27 @@ returning a boolean for each path. Modify the `prevent()` function in
 `watchman/extension.py` to enable this.
 
 By default `prevent()` returns `False` and does not prevent any API calls.
+
+## Running Watchman as a Service
+Watchman can be run as a service in your production environments. Currently,
+only Linux environments are supported.
+
+1. Download `watchman_sync` and `watchman_worker` to your in `/etc/init.d` folder
+2. Create folder `/var/run/watchman` to store pids file
+3. Create a `/tmp` if it is not present already
+4. Give appropriate permissions to `/var/run/watchman` and `/tmp` (to whichever user Watchman is running from)
+
+To start the service
+Run `service watchman_sync start` and `service watchman_worker start`
+
+To stop the service
+Run `service watchman_sync stop` and `service watchman_worker stop`
+
+To restart the service
+Run `service watchman_sync restart` and `service watchman_worker restart`
+
+## Logs
+All Watchman logs are maintained at `/tmp/watchman.log`
 
 License
 --------
