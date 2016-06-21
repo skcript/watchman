@@ -7,6 +7,7 @@ from rratelimit import Limiter
 
 # Modules in Watchman
 from conf import load_endpoints, LOG_FILENAME, REDIS, RL_LIMIT, RL_PERIOD
+from extension import ratelimit, prevent
 
 ENDPOINTS = load_endpoints()
 # Ratelimiter limiting pigeon at RL_LIMIT actions per RL_PERIOD
@@ -16,33 +17,15 @@ LIMITER = Limiter(REDIS, action='pigeon', limit=RL_LIMIT, period=RL_PERIOD)
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
 log = logging.getLogger("watchman.pigeon")
 
-# Regex to extract name from path watched
-REGEX = re.compile("([a-zA-Z0-9_ -/]*)/active/home/(\w+)/")
-
-# Extracting user name from path
-def get_user_name(path):
-    r = REGEX.match(path)
-    if r:
-        name = r.group(2)
-        return name
-
-# Checking if server is ready to accept request for that path
-def check_paths(path):
-    avl = REDIS.scan_iter(match="{0}*".format(path))
-    srv = REDIS.get("migration") or REDIS.get("import") or REDIS.get("snapshot")
-    return (sum(1 for _ in avl) > 0 or srv)
-
 # Ratelimiting server pings at RL_LIMIT actions per RL_PERIOD
 def ratelimit():
     def decorate(func):
         def rateLimitedFunction(*args,**kargs):
-            name = get_user_name(args[0])
+            name = ratelimit(args[0])
             if name:
                 while not LIMITER.checked_insert(name):
                     print "{0} is being rate limited".format(name)
                     time.sleep(0.5)
-            else:
-                print "Invalid args, {0}".format(args)
 
             ret = func(*args,**kargs)
             return ret
@@ -74,17 +57,17 @@ def dumpargs():
 def prevent():
     def decorate(func):
         def decorateDump(*args, **kargs):
-            val = True
+            val = False
             for arg in args:
-                if check_paths(arg):
-                    val = False
+                if prevent(arg):
+                    val = True
                     break
 
             if val:
+                print "Not calling"
+            else:
                 ret = func(*args, **kargs)
                 return ret
-            else:
-                print "Not calling"
 
         return decorateDump
     return decorate
