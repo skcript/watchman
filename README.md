@@ -2,10 +2,10 @@
 Ping file system events to any API
 
 * [Dependencies](#dependencies)
-* [Compiling & Configuring](#compiling--configuring)
+* [Installing](#installing)
 * [Running Watchman](#running-watchman)
 * [Functions](#functions)
-* [YAML Configuration](#yaml-config)
+* [YAML Configuration](#yaml-configuration)
 * [Extending](#extending)
 * [Running Watchman as a Service](#running-watchman-as-a-service)
 * [Logs](#logs)
@@ -29,7 +29,7 @@ Ping file system events to any API
 * `watchman sync`: Watches over all paths added to `source` in [YAML configuration file](#yaml-config)
 * `watchman worker`: Starts the RQ worker to ping all endpoints added to `endpoints` in [YAML configuration file](#yaml-config)
 
-## YAML configuration
+## YAML Configuration
 This YAML is automatically created in the `~` directory. It holds all the configuration attributes for Watchman.
 
 #### Attributes
@@ -90,19 +90,19 @@ only Linux environments are supported.
 3. Create a `/tmp` if it is not present already
 4. Give appropriate permissions to `/var/run/watchman` and `/tmp` (to whichever user Watchman is running from)
 
-To start the service
+**To start the service**
 ```
   service watchman_sync start
   service watchman_worker start
 ```
 
-To stop the service
+**To stop the service**
 ```
   service watchman_sync stop
   service watchman_worker stop
 ```
 
-To restart the service
+**To restart the service**
 ```
   service watchman_sync restart
   service watchman_worker restart
