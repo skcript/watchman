@@ -7,13 +7,11 @@ from rratelimit import Limiter
 
 # Modules in Watchman
 from conf import load_endpoints, LOG_FILENAME, REDIS, RL_LIMIT, RL_PERIOD
+import extension
 
 ENDPOINTS = load_endpoints()
 # Ratelimiter limiting pigeon at RL_LIMIT actions per RL_PERIOD
 LIMITER = Limiter(REDIS, action='pigeon', limit=RL_LIMIT, period=RL_PERIOD)
-
-# Regex to extract name from path watched
-REGEX = re.compile("([a-zA-Z0-9_ -/]*)/active/home/(\w+)/")
 
 # Logger Creds
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
@@ -21,105 +19,106 @@ log = logging.getLogger("watchman.pigeon")
 
 # Ratelimiting server pings at RL_LIMIT actions per RL_PERIOD
 def ratelimit():
-    def decorate(func):
-        def rateLimitedFunction(*args,**kargs):
-            name = get_user_name(args[0])
+    """
+        This decorator ratelimits an API call based on string returned by
+        extension.ratelimit()
+    """
+    def decorateRatelimit(func):
+        def ratelimitFunction(*args,**kargs):
+            name = extension.ratelimit(args[0])
             if name:
                 while not LIMITER.checked_insert(name):
                     print "{0} is being rate limited".format(name)
                     time.sleep(0.5)
-            else:
-                print "Invalid args, {0}".format(args)
 
             ret = func(*args,**kargs)
             return ret
 
-        return rateLimitedFunction
-    return decorate
+        return ratelimitFunction
+    return decorateRatelimit
 
-# Extracting user name from path
-def get_user_name(path):
-    r = REGEX.match(path)
-    if r:
-        name = r.group(2)
-        return name
+def dumpargs():
+    """
+        This decorator dumps out the arguments passed to a function before
+        calling it
+    """
+    def decorateDumpargs(func):
+        argnames = func.func_code.co_varnames[:func.func_code.co_argcount]
+        fname = func.func_name
+        def dumpargsFunction(*args, **kargs):
+            string = "Calling '" + fname + "' with args: " + ", ".join(
+                                            '%s=%r' % entry
+                                            for entry in zip(argnames, args[:len(argnames)])
+                                        )
+            print string
+            log.debug(string)
 
-# Checking if server is ready to accept request
-def check_server():
-    return REDIS.get("migration") or REDIS.get("import") or REDIS.get("snapshot")
+            ret = func(*args, **kargs)
+            return ret
 
-# Checking if server is ready to accept request for that path
-def check_path_processing(path):
-    avl = REDIS.scan_iter(match="{0}*".format(path))
-    srv = check_server()
-    return (sum(1 for _ in avl) > 0 or srv)
+        return dumpargsFunction
+    return decorateDumpargs
 
-# ---- Actual server pings ----
+def prevent():
+    """
+        This decorator prevents an API call by comparing boolean returned by
+        extension.prevent()
+    """
+    def decoratePrevent(func):
+        def preventFunction(*args, **kargs):
+            val = False
+            for arg in args:
+                if extension.prevent(arg):
+                    val = True
+                    break
 
+            if val:
+                print "Not calling"
+            else:
+                ret = func(*args, **kargs)
+                return ret
+
+        return preventFunction
+    return decoratePrevent
+
+@prevent()
 @ratelimit()
+@dumpargs()
 def post_folder_creation(src):
-    if check_path_processing(src):
-        log.debug("Not sending folder creation for {0}".format(src))
-        print("Not sending folder creation for {0}".format(src))
-    else:
-        log.debug("Sending folder creation for {0}".format(src))
-        print("Sending folder creation for {0}".format(src))
-        options = { 'path': src }
-        requests.post(ENDPOINTS['folder_create'], params=options)
+    options = { 'path': src }
+    requests.post(ENDPOINTS['folder_create'], params=options)
 
+@prevent()
 @ratelimit()
+@dumpargs()
 def post_file_creation(src):
-    if check_path_processing(src):
-        log.debug("Not sending file creation for {0}".format(src))
-        print("Not sending file creation for {0}".format(src))
-    else:
-        log.debug("Sending file creation for {0}".format(src))
-        print("Sending file creation for {0}".format(src))
-        options = { 'path': src }
-        requests.post(ENDPOINTS['file_create'], params=options)
+    options = { 'path': src }
+    requests.post(ENDPOINTS['file_create'], params=options)
 
+@prevent()
 @ratelimit()
+@dumpargs()
 def post_folder_destroy(src):
-    if check_server():
-        log.debug("Not sending folder destroy at {0}".format(src))
-        print("Not sending folder destroy at {0}".format(src))
-    else:
-        log.debug("Removing folder at {0}".format(src))
-        print("Removing folder at {0}".format(src))
+    options = { 'path': src }
+    requests.post(ENDPOINTS['folder_destroy'], params=options)
 
-        options = { 'path': src }
-        requests.post(ENDPOINTS['folder_destroy'], params=options)
-
+@prevent()
 @ratelimit()
+@dumpargs()
 def post_file_destroy(src):
-    if check_server():
-        log.debug("Not sending file destroy at {0}".format(src))
-        print("Not sending file destroy at {0}".format(src))
-    else:
-        log.debug("Removing file at {0}".format(src))
-        print("Removing file at {0}".format(src))
+    options = { 'path': src }
+    requests.post(ENDPOINTS['file_destroy'], params=options)
 
-        options = { 'path': src }
-        requests.post(ENDPOINTS['file_destroy'], params=options)
-
+@prevent()
 @ratelimit()
+@dumpargs()
 def post_folder_move(src, dest):
-    if check_path_processing(src) or check_path_processing(dest):
-        log.debug("Not sending folder movement from {0} to {1}".format(src, dest))
-        print("Not sending folder movement from {0} to {1}".format(src, dest))
-    else:
-        log.debug("Sending folder movement from {0} to {1}".format(src, dest))
-        print("Sending folder movement from {0} to {1}".format(src, dest))
-        options = { 'oldpath': src, 'newpath': dest }
-        requests.post(ENDPOINTS['folder_move'], params=options)
+    options = { 'oldpath': src, 'newpath': dest }
+    requests.post(ENDPOINTS['folder_move'], params=options)
 
+@prevent()
 @ratelimit()
+@dumpargs()
 def post_file_move(src, dest):
-    if check_path_processing(src) or check_path_processing(dest):
-        log.debug("Not sending file movement from {0} to {1}".format(src, dest))
-        print("Not sending file movement from {0} to {1}".format(src, dest))
-    else:
-        log.debug("Sending file movement from {0} to {1}".format(src, dest))
-        print("Sending file movement from {0} to {1}".format(src, dest))
-        options = { 'oldpath': src, 'newpath': dest }
-        requests.post(ENDPOINTS['file_move'], params=options)
+    options = { 'oldpath': src, 'newpath': dest }
+    requests.post(ENDPOINTS['file_move'], params=options)
