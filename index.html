@@ -31,7 +31,7 @@
         <h1>
 <a id="watchman" class="anchor" href="#watchman" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Watchman</h1>
 
-<p>A Watchdog that pings file changes to an API of your choice.</p>
+<p>Ping file system events to any API</p>
 
 <ul>
 <li><a href="#dependencies">Dependencies</a></li>
@@ -40,11 +40,12 @@
 <li><a href="#functions">Functions</a></li>
 <li><a href="#yaml-config">YAML Configuration</a></li>
 <li><a href="#logs">Logs</a></li>
+<li><a href="#extending">Extending</a></li>
 <li><a href="#license">License</a></li>
 </ul>
 
-<h3>
-<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dependencies</h3>
+<h2>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dependencies</h2>
 
 <ul>
 <li>Python 2.7 (Developed and Tested)</li>
@@ -52,18 +53,18 @@
 <li><a href="http://python-rq.org">RQ</a></li>
 </ul>
 
-<h3>
-<a id="compiling--configuring" class="anchor" href="#compiling--configuring" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Compiling &amp; Configuring</h3>
+<h2>
+<a id="installing" class="anchor" href="#installing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing</h2>
 
 <ol>
-<li>Clone this Repo</li>
+<li>Download this Repo</li>
 <li>Run <code>python setup.py install</code>
 </li>
 <li>Configure the app by running <code>watchman configure</code>. Or copy the <a href="#yaml-config">default YAML file</a> to <code>~</code>.</li>
 </ol>
 
-<h3>
-<a id="running-watchman" class="anchor" href="#running-watchman" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running Watchman</h3>
+<h2>
+<a id="running-watchman" class="anchor" href="#running-watchman" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running Watchman</h2>
 
 <ol>
 <li>From Terminal, run <code>watchman sync</code>
@@ -72,8 +73,8 @@
 </li>
 </ol>
 
-<h3>
-<a id="functions" class="anchor" href="#functions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Functions</h3>
+<h2>
+<a id="functions" class="anchor" href="#functions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Functions</h2>
 
 <ul>
 <li>
@@ -84,8 +85,8 @@
 </li>
 </ul>
 
-<h3>
-<a id="yaml-configuration" class="anchor" href="#yaml-configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>YAML configuration</h3>
+<h2>
+<a id="yaml-configuration" class="anchor" href="#yaml-configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>YAML configuration</h2>
 
 <p>This YAML is automatically created in the <code>~</code> directory. It holds all the configuration attributes for Watchman.</p>
 
@@ -117,10 +118,48 @@
     folder_destroy: "http://localhost/api/v2/folders/destroy"
 </code></pre>
 
-<h3>
-<a id="logs" class="anchor" href="#logs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Logs</h3>
+<h2>
+<a id="logs" class="anchor" href="#logs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Logs</h2>
 
 <p>All Watchman logs are maintained at <code>/tmp/watchman.log</code></p>
+
+<h2>
+<a id="extending" class="anchor" href="#extending" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Extending</h2>
+
+<p>Watchman can ratelimit and selectively prevent your API calls for each file
+system event. These are managed in <code>watchman/extension.py</code>. Each function defined
+in <code>extension.py</code> takes path (where the file system event occurred) as input.</p>
+
+<h3>
+<a id="ratelimiting" class="anchor" href="#ratelimiting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Ratelimiting</h3>
+
+<p>Watchman can ratelimit your API calls based on a unique string at 100 calls
+per second.</p>
+
+<p>The unique string is used to group your API calls. Modify the <code>ratelimit()</code>
+function in <code>watchman/extension.py</code> to enable this. By default it returns the
+root directory of the path Watchman is watching.</p>
+
+<p>For example, if you are monitoring <code>/uploads</code> folder which has directories for
+each user, like,</p>
+
+<ul>
+<li><code>/uploads/user1</code></li>
+<li><code>/uploads/user2</code></li>
+<li><code>/uploads/user3</code></li>
+</ul>
+
+<p>Modify <code>ratelimit()</code> to return the username from the path. This way you can
+ratelimit API calls based on each user.</p>
+
+<h3>
+<a id="preventing" class="anchor" href="#preventing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Preventing</h3>
+
+<p>Watchman can selectively prevent API calls from being triggered by simply
+returning a boolean for each path. Modify the <code>prevent()</code> function in
+<code>watchman/extension.py</code> to enable this.</p>
+
+<p>By default <code>prevent()</code> returns <code>False</code> and does not prevent any API calls.</p>
 
 <h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
