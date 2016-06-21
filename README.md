@@ -32,12 +32,12 @@ Ping file system events to any API
 ## YAML Configuration
 This YAML is automatically created in the `~` directory. It holds all the configuration attributes for Watchman.
 
-#### Attributes
+### Attributes
 * `source`: Array of all paths Watchman should monitor
 * `regexes`: Array of all regexes Watchman should abide by (These regexes are matched with the filepath)
 * `endpoints`: Hash of each file/folder action which should ping to an API endpoint
 
-#### Default File
+### Default File
 ```
   source:
     - /home/users/skcript
