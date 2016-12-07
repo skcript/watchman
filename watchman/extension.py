@@ -1,4 +1,4 @@
-# COMMON FOR ALL FUNCTION DEFINED HERE
+# COMMON FOR ALL FUNCTIONS DEFINED HERE
 # Accepts path as input
 # For create, destroy actions, this function is called with src path
 # For move actions, this function is called twice for src and dest path
